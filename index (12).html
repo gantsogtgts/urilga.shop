@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Хуримын урилга</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans:wght@400;600&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+:root{--navy:#0f1d36;--sky:#1f4e8c;--paper:#f3f6fa;--ink:#14233f;--red:#b4322e;--card:#fff;--line:#d5deea;
+--serif:"Cormorant Garamond",Georgia,serif;--sans:"Noto Sans",system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b1426;--ink:#e6edf7;--card:#13213a;--line:#26385a;--sky:#7fb0f0}}
+:root[data-theme="dark"]{--paper:#0b1426;--ink:#e6edf7;--card:#13213a;--line:#26385a;--sky:#7fb0f0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 var(--sans)}
+.hero{background:var(--navy);color:#fff;text-align:center;padding:72px 20px 56px;position:relative}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18px;background:var(--red) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18'%3E%3Cpath d='M0 15h6V3h24v12H12V9h12' fill='none' stroke='%23f3f6fa' stroke-width='2'/%3E%3C/svg%3E") repeat-x}
+.hero p{margin:0;opacity:.8;letter-spacing:.04em}
+.names{font:700 clamp(48px,13vw,110px)/1 var(--serif);margin:18px 0}
+.names span{display:block;font-size:.38em;font-weight:400;font-style:italic;margin:6px 0;color:#9cc0ee}
+.date{font:600 clamp(20px,4vw,28px) var(--serif);margin-top:8px}
+main{max-width:640px;margin:0 auto;padding:40px 20px 64px}
+h2{font:700 32px/1.2 var(--serif);margin:48px 0 14px}
+.when{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.when div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 4px}
+.when b{display:block;font:700 34px/1 var(--serif)}
+.when small{color:var(--sky)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0}
+dt{color:var(--sky);font-weight:600}dd{margin:0}
+a{color:var(--sky)}
+form{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px}
+label{display:block;font-weight:600;margin:0 0 6px}
+input[type=text],textarea{width:100%;font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:16px}
+textarea{min-height:90px;resize:vertical}
+.opts{display:grid;gap:8px;margin-bottom:18px}
+.opts label{display:flex;gap:10px;align-items:center;font-weight:400;margin:0;border:1px solid var(--line);border-radius:6px;padding:10px 12px;cursor:pointer}
+.opts label:has(input:checked){border-color:var(--sky);background:color-mix(in srgb,var(--sky) 12%,transparent)}
+.fam{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:-6px 0 18px}
+.fam[hidden]{display:none}
+.fam input{margin-bottom:0}
+input[type=number]{width:100%;font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+button{font:600 16px var(--sans);background:var(--sky);color:#fff;border:0;border-radius:6px;padding:12px 22px;cursor:pointer}
+:root[data-theme="dark"] button{color:#0b1426}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.ok{color:var(--sky);font-weight:600;margin-top:12px;min-height:1.5em}
+.wish{border-left:3px solid var(--red);padding:2px 0 2px 14px;margin:0 0 18px}
+.wish b{font-family:var(--serif);font-size:20px}
+.wish p{margin:2px 0 0;white-space:pre-wrap}
+.empty{color:var(--sky)}
+footer{text-align:center;color:var(--sky);padding:0 20px 40px;font-size:14px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <p id="kicker"></p>
+  <h1 class="names" id="names"></h1>
+  <div class="date" id="dateText"></div>
+</header>
+<main>
+  <section class="when" aria-label="Хуримд үлдсэн хугацаа">
+    <div><b id="d">0</b><small>өдөр</small></div>
+    <div><b id="h">0</b><small>цаг</small></div>
+    <div><b id="m">0</b><small>минут</small></div>
+    <div><b id="s">0</b><small>секунд</small></div>
+  </section>
+
+  <h2>Хуримын мэдээлэл</h2>
+  <dl id="info"></dl>
+
+  <h2>Ирэх эсэхээ хэлнэ үү</h2>
+  <form id="rsvp">
+    <label for="n">Таны нэр</label>
+    <input id="n" type="text" required maxlength="60">
+    <div class="opts" role="radiogroup" aria-label="Хариу">
+      <label><input type="radio" name="a" value="Оролцоно" checked> Оролцоно</label>
+      <label><input type="radio" name="a" value="Гэр бүлтэйгээ оролцоно"> Гэр бүлтэйгээ оролцоно</label>
+      <label><input type="radio" name="a" value="Харамсалтай нь очиж чадахгүй"> Харамсалтай нь очиж чадахгүй</label>
+    </div>
+    <div class="fam" id="fam" hidden>
+      <div><label for="ad">Том хүн</label><input id="ad" type="number" min="1" max="20" value="2" inputmode="numeric"></div>
+      <div><label for="kd">Хүүхэд</label><input id="kd" type="number" min="0" max="20" value="0" inputmode="numeric"></div>
+    </div>
+    <button>Хариу илгээх</button>
+    <div class="ok" id="rok" role="status"></div>
+  </form>
+
+  <h2>Ерөөл</h2>
+  <form id="wf">
+    <label for="wn">Нэр</label>
+    <input id="wn" type="text" required maxlength="60">
+    <label for="wt">Ерөөл, захиа</label>
+    <textarea id="wt" required maxlength="500"></textarea>
+    <button>Ерөөл бичих</button>
+  </form>
+  <div id="wishes" style="margin-top:28px"></div>
+</main>
+<footer>Урилгыг urilga.online-аар бэлтгэв</footer>
+
+<script>
+// Нэг үйл явдлын мэдээлэл. Олон хэрэглэгчтэй болоход энэ хэсэг өгөгдлийн сангаас ирнэ.
+const EVENT = {
+  slug: "demo",
+  groom: "Бат", bride: "Сараа",
+  date: "2027-06-19T12:00:00+08:00",
+  dateText: "2027 оны 6-р сарын 19, Бямба гараг",
+  kicker: "Бид гэрлэж байна",
+  details: [
+    ["Цаг", "12:00, угтан авалт 11:30"],
+    ["Газар", "Улаанбаатар, Чингис хаан зочид буудал, Их танхим"],
+    ["Хувцас", "Үндэсний хувцас эсвэл албан ёсны хувцас"],
+    ["Холбоо барих", "9911 0000"]
+  ],
+  mapUrl: "https://maps.google.com/?q=Ulaanbaatar"
+};
+const $ = id => document.getElementById(id);
+$("kicker").textContent = EVENT.kicker;
+$("names").innerHTML = EVENT.groom + "<span>ба</span>" + EVENT.bride;
+$("dateText").textContent = EVENT.dateText;
+document.title = EVENT.groom + " & " + EVENT.bride + " - хуримын урилга";
+$("info").innerHTML = EVENT.details.map(([k,v]) => "<dt></dt><dd></dd>").join("") + "<dt>Газрын зураг</dt><dd><a target='_blank' rel='noopener' href='" + EVENT.mapUrl + "'>Нээх</a></dd>";
+[...$("info").querySelectorAll("dt")].slice(0,-1).forEach((e,i)=>{e.textContent=EVENT.details[i][0];e.nextElementSibling.textContent=EVENT.details[i][1]});
+
+function tick(){
+  let t = Math.max(0, new Date(EVENT.date) - Date.now()) / 1000;
+  $("d").textContent = Math.floor(t/86400);
+  $("h").textContent = Math.floor(t%86400/3600);
+  $("m").textContent = Math.floor(t%3600/60);
+  $("s").textContent = Math.floor(t%60);
+}
+tick(); setInterval(tick, 1000);
+
+// Түр хадгалалт: зөвхөн энэ хөтөч дээр. Жинхэнэ хувилбарт Supabase руу бичнэ.
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(EVENT.slug + ":" + k)) || [] } catch(e){ return [] } },
+  set(k,v){ try { localStorage.setItem(EVENT.slug + ":" + k, JSON.stringify(v)) } catch(e){} }
+};
+function renderWishes(){
+  const w = store.get("wishes"), box = $("wishes");
+  box.innerHTML = "";
+  if(!w.length){ box.innerHTML = "<p class='empty'>Анхны ерөөлийг та бичээрэй.</p>"; return; }
+  w.slice().reverse().forEach(x => {
+    const d = document.createElement("div"); d.className = "wish";
+    const b = document.createElement("b"); b.textContent = x.n;
+    const p = document.createElement("p"); p.textContent = x.t;
+    d.append(b, p); box.append(d);
+  });
+}
+const answer = () => document.querySelector("input[name=a]:checked").value;
+const isFam = () => answer() === "Гэр бүлтэйгээ оролцоно";
+document.querySelectorAll("input[name=a]").forEach(i => i.onchange = () => { $("fam").hidden = !isFam(); });
+const num = (id, min) => Math.max(min, Math.min(20, parseInt($(id).value, 10) || min));
+$("rsvp").onsubmit = e => {
+  e.preventDefault();
+  const a = answer(), fam = isFam();
+  // adults/kids: ганцаараа = 1 том хүн, очихгүй = 0
+  const adults = fam ? num("ad", 1) : (a === "Оролцоно" ? 1 : 0);
+  const kids = fam ? num("kd", 0) : 0;
+  const r = store.get("rsvps");
+  r.push({n: $("n").value.trim(), a, adults, kids, ts: Date.now()});
+  store.set("rsvps", r);
+  $("rok").textContent = "Хариуг хүлээн авлаа. Баярлалаа!" + (adults + kids ? " Ирэх: " + adults + " том хүн" + (kids ? ", " + kids + " хүүхэд" : "") + "." : "");
+  $("rsvp").reset(); $("fam").hidden = true;
+};
+$("wf").onsubmit = e => {
+  e.preventDefault();
+  const w = store.get("wishes");
+  w.push({n: $("wn").value.trim(), t: $("wt").value.trim(), ts: Date.now()});
+  store.set("wishes", w);
+  $("wf").reset(); renderWishes();
+};
+renderWishes();
+</script>
+</body>
+</html>
